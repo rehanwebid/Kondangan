@@ -126,7 +126,7 @@
             font-size: 0.7rem;
             font-weight: 400;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin-left: auto;
         }
 
@@ -461,9 +461,7 @@
 
     <script>
         const MAX_HISTORY = 20;
-        const STORAGE_KEY = 'buku_kondangan';
-        const VERSION_KEY = 'buku_kondangan_version';
-        const CURRENT_VERSION = 3;
+        const STORAGE_KEY = 'buku_kondangan_user';
 
         // ===== DEFAULT DATA =====
         const defaultData = {
@@ -674,7 +672,7 @@
                     { nama: 'Rastinah/Carta', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' }
                 ],
                 gilang: [
-                    
+
                 ]
             }
         };
@@ -684,79 +682,26 @@
             gilang: '#22c55e'
         };
 
-        function loadData() {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            const savedVersion = localStorage.getItem(VERSION_KEY);
-
-            let appData;
-
-            if (raw && savedVersion == CURRENT_VERSION) {
-                try {
-                    appData = JSON.parse(raw);
-                } catch (e) {
-                    appData = createFreshData();
-                }
-            } else {
-                if (raw) {
-                    try {
-                        appData = JSON.parse(raw);
-                        appData = mergeNewMembers(appData);
-                    } catch (e) {
-                        appData = createFreshData();
-                    }
-                } else {
-                    appData = createFreshData();
-                }
+        // ===== DATA AKTIF (TIDAK DISIMPAN KE LOCALSTORAGE) =====
+        let appData = {
+            users: JSON.parse(JSON.stringify(defaultData.users)),
+            history: {
+                rehan: [],
+                gilang: []
             }
+        };
 
-            localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
-            saveData(appData);
-            return appData;
+        // Hanya simpan currentUser ke localStorage
+        function loadCurrentUser() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return (saved === 'rehan' || saved === 'gilang') ? saved : 'rehan';
         }
 
-        function createFreshData() {
-            return {
-                currentUser: 'rehan',
-                users: JSON.parse(JSON.stringify(defaultData.users)),
-                history: {
-                    rehan: [],
-                    gilang: []
-                }
-            };
+        function saveCurrentUser(user) {
+            localStorage.setItem(STORAGE_KEY, user);
         }
 
-        function mergeNewMembers(oldData) {
-            Object.keys(defaultData.users).forEach(userKey => {
-                if (!oldData.users[userKey]) {
-                    oldData.users[userKey] = JSON.parse(JSON.stringify(defaultData.users[userKey]));
-                } else {
-                    const defaultMembers = defaultData.users[userKey];
-                    const existingMembers = oldData.users[userKey];
-
-                    defaultMembers.forEach(defMember => {
-                        const found = existingMembers.find(
-                            m => m.nama === defMember.nama && m.alamat === defMember.alamat
-                        );
-                        if (!found) {
-                            existingMembers.push({ ...defMember, status: 'belum' });
-                        }
-                    });
-                }
-
-                if (!oldData.history[userKey]) {
-                    oldData.history[userKey] = [];
-                }
-            });
-
-            return oldData;
-        }
-
-        function saveData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
-
-        let appData = loadData();
-        let currentUser = appData.currentUser;
+        let currentUser = loadCurrentUser();
 
         function applyTheme(user) {
             const color = userColors[user];
@@ -786,7 +731,7 @@
                         <td>${item.beras}</td>
                         <td>${item.rupiah}</td>
                         <td>
-                            <button class="status-btn ${item.status}" 
+                            <button class="status-btn ${item.status}"
                                 style="background: ${item.status === 'belum' ? userColors[currentUser] : '#d1d5db'}; color: ${item.status === 'belum' ? 'white' : '#6b7280'};"
                                 onclick="toggleStatus(this, '${item.nama}', '${item.alamat}')">
                                 ${item.status === 'belum' ? 'Belum' : 'Sudah'}
@@ -801,8 +746,7 @@
 
         function switchUser() {
             currentUser = currentUser === 'rehan' ? 'gilang' : 'rehan';
-            appData.currentUser = currentUser;
-            saveData(appData);
+            saveCurrentUser(currentUser);
             applyTheme(currentUser);
             renderTable();
             renderHistory();
@@ -840,7 +784,6 @@
                     appData.history[currentUser] = appData.history[currentUser].slice(0, MAX_HISTORY);
                 }
 
-                saveData(appData);
                 renderHistory();
             }
         }
