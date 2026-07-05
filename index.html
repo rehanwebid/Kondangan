@@ -1,1073 +1,1714 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Buku Kondangan</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>E-Book Resepsi</title>
+
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
     <style>
+        /* ================================================================
+                   RESET & BASE
+                   ================================================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             width: 100%;
             height: 100%;
-            background: white;
-        }
-
-        .app {
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            background: #f4f6fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1a1a2e;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .main-page {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-            position: relative;
+        :root {
+            --primary: #0f3b7a;
+            --primary-light: #1a5bb5;
+            --primary-lighter: #e8edf5;
+            --secondary: #f5a623;
+            --secondary-light: #fef3d6;
+            --bg: #f4f6fa;
+            --white: #ffffff;
+            --border: #e9ecf0;
+            --text: #1a1a2e;
+            --text-secondary: #6b7280;
+            --shadow: 0 4px 20px rgba(15, 59, 122, 0.08);
         }
 
-        .main-page.hidden {
-            transform: translateX(-100%);
+        /* GILANG JUGA BIRU (SAMA KAYA REHAN) */
+        .theme-gilang {
+            --primary: #0f3b7a;
+            --primary-light: #1a5bb5;
+            --primary-lighter: #e8edf5;
+            --shadow: 0 4px 20px rgba(15, 59, 122, 0.08);
         }
 
-        .cs-btn {
-            position: absolute;
-            bottom: 1.5rem;
-            right: 1.25rem;
-            width: 3.5rem;
-            height: 3.5rem;
-            background: var(--primary-color, #2563eb);
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-            z-index: 20;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s, background 0.3s;
-        }
-
-        .cs-btn:active {
-            transform: scale(0.95);
-        }
-
-        .cs-btn svg {
-            width: 1.5rem;
-            height: 1.5rem;
-            color: white;
-        }
-
-        .history-page {
-            position: absolute;
+        /* ================================================================
+                   SPLASH SCREEN (A1) - FULL WIDTH, TANPA RADIUS
+                   ================================================================ */
+        #splash {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: white;
+            height: 100vh;
+            background: #ffffff;
             display: flex;
             flex-direction: column;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 0;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
         }
 
-        .history-page.active {
-            transform: translateX(0);
+        #splash.hide {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .history-header {
+        .splash-image {
             width: 100%;
-            background: var(--primary-color, #2563eb);
-            padding: 0.6rem 1.25rem;
+            aspect-ratio: 16 / 5;
+            object-fit: cover;
+            display: block;
+            border-radius: 0 !important;
+        }
+
+        .splash-caption {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .splash-loading {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .splash-balls {
+            width: 48px;
+            height: 24px;
+            position: relative;
+        }
+
+        .ball {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            position: absolute;
+            animation: tabrakan 0.7s ease-in-out infinite alternate;
+        }
+
+        .ball-blue {
+            background: #0f3b7a;
+            left: 0;
+            animation-name: tabrakan-blue;
+        }
+
+        .ball-yellow {
+            background: #f5a623;
+            right: 0;
+            animation-name: tabrakan-yellow;
+        }
+
+        @keyframes tabrakan-blue {
+            0% {
+                left: 0;
+                transform: scale(1);
+            }
+            100% {
+                left: calc(100% - 14px);
+                transform: scale(0.85);
+            }
+        }
+
+        @keyframes tabrakan-yellow {
+            0% {
+                right: 0;
+                transform: scale(0.85);
+            }
+            100% {
+                right: calc(100% - 14px);
+                transform: scale(1);
+            }
+        }
+
+        .splash-text {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            letter-spacing: 2px;
+            animation: kedip 1.2s ease-in-out infinite;
+        }
+
+        @keyframes kedip {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        /* ================================================================
+                   HALAMAN UTAMA
+                   ================================================================ */
+        #main {
+            width: 100%;
+            height: 100vh;
+            background: var(--bg);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #main.show {
+            opacity: 1;
+        }
+
+        /* ---------- HERO ---------- */
+        .hero {
+            background: linear-gradient(145deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 20px 20px 28px 20px;
+            border-radius: 0 0 28px 28px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: background 0.4s ease;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -30%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .hero-top {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            flex-shrink: 0;
-            color: white;
-            transition: background 0.3s;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 1;
         }
 
-        .back-btn {
-            background: none;
-            border: none;
+        .hero-user {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hero-avatar-wrap {
+            position: relative;
             cursor: pointer;
-            padding: 0.3rem;
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+        }
+
+        .hero-avatar-wrap:active {
+            transform: scale(0.92);
+        }
+
+        .hero-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .back-btn svg {
-            width: 1.5rem;
-            height: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.25);
             color: white;
+            font-size: 20px;
+            transition: all 0.3s;
         }
 
-        .history-title {
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        .hero-avatar-wrap:hover .hero-avatar {
+            background: rgba(255, 255, 255, 0.25);
         }
 
-        .history-info {
-            font-size: 0.7rem;
+        .hero-avatar-refresh {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: white;
+            border: 2px solid var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-avatar-wrap:active .hero-avatar-refresh {
+            transform: rotate(180deg);
+        }
+
+        .hero-name h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.3px;
+        }
+
+        .hero-name p {
+            font-size: 11px;
             font-weight: 400;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             color: rgba(255, 255, 255, 0.7);
-            margin-left: auto;
         }
 
-        .history-content {
+        .hero-actions {
+            display: flex;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-btn {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .hero-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn:active {
+            transform: scale(0.92);
+        }
+
+        .hero-greeting {
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-greeting h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-greeting p {
+            font-size: 13px;
+            opacity: 0.75;
+            margin-top: 2px;
+        }
+
+        /* ---------- SEARCH ---------- */
+        .search-section {
+            padding: 14px 20px 6px 20px;
+            flex-shrink: 0;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--white);
+            border-radius: 14px;
+            padding: 10px 16px;
+            gap: 12px;
+            border: 1.5px solid var(--border);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-lighter);
+        }
+
+        .search-bar i {
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .search-bar input {
             flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: transparent;
+        }
+
+        .search-bar input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-filter {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .search-filter:hover {
+            color: var(--primary);
+        }
+
+        /* ---------- GUEST LIST ---------- */
+        .guest-list {
+            flex: 1;
+            padding: 8px 20px 16px 20px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        .history-content table {
-            width: 100%;
-            border-collapse: collapse;
+        .guest-list::-webkit-scrollbar {
+            width: 4px;
         }
 
-        .history-content thead th {
-            padding: 0.6rem 1rem;
-            font-size: 0.8rem;
+        .guest-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .guest-list::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 4px;
+        }
+
+        .guest-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .guest-list-header h3 {
+            font-size: 14px;
             font-weight: 700;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #374151;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            text-align: left;
-            background: #f8fafc;
-            border-bottom: 2px solid #e5e7eb;
-            position: sticky;
-            top: 0;
+            color: var(--text);
         }
 
-        .history-content tbody td {
-            padding: 0.6rem 1rem;
-            font-size: 0.8rem;
+        .guest-list-header span {
+            font-size: 12px;
+            color: var(--text-secondary);
             font-weight: 500;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #374151;
-            white-space: nowrap;
-            text-align: left;
-            border-bottom: 1px solid #f1f5f9;
         }
 
-        .history-empty {
-            padding: 2rem 1.25rem;
-            text-align: center;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #94a3b8;
-            font-size: 0.9rem;
+        .guest-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+            cursor: default;
         }
 
-        .header {
-            width: 100%;
-            background: var(--primary-color, #2563eb);
-            padding: 0.6rem 1.25rem;
+        .guest-card:active {
+            transform: scale(0.98);
+        }
+
+        .guest-row {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            flex-shrink: 0;
-            transition: background 0.3s;
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
-        .profile-left {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-shrink: 0;
-        }
-
-        .profile-icon {
-            width: 2.2rem;
-            height: 2.2rem;
-            background: white;
+        .guest-avatar {
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s;
-        }
-
-        .profile-icon:active {
-            transform: scale(0.9);
-        }
-
-        .profile-icon svg {
-            width: 1.3rem;
-            height: 1.3rem;
-            color: var(--primary-color, #2563eb);
-            transition: color 0.3s;
-        }
-
-        .profile-name {
-            color: white;
-            font-size: 0.8rem;
-            font-weight: 600;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .search-box {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            background: white;
-            border-radius: 0.5rem;
-            padding: 0.35rem 0.6rem;
-            gap: 0.4rem;
-            margin-left: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .search-box input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #1e293b;
-            font-size: 0.9rem;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            width: 100%;
-            order: 1;
-        }
-
-        .search-box input::placeholder {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .search-box svg {
-            width: 1.1rem;
-            height: 1.1rem;
-            color: #64748b;
-            flex-shrink: 0;
-            order: 2;
-        }
-
-        .clock-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            margin-left: 0.5rem;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .clock-btn svg {
-            width: 1.3rem;
-            height: 1.3rem;
-            color: white;
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            flex: 1;
-        }
-
-        .table-wrapper::-webkit-scrollbar {
-            display: none;
-        }
-
-        table {
-            width: max-content;
-            min-width: 100%;
-            border-collapse: collapse;
-            table-layout: auto;
-        }
-
-        thead th {
-            padding: 0.6rem 1rem;
-            font-size: 0.8rem;
             font-weight: 700;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #374151;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            text-align: left;
-            background: #f8fafc;
-            border-bottom: 2px solid #e5e7eb;
-            border-right: 1.5px solid #d1d5db;
-            position: sticky;
-            top: 0;
-        }
-
-        thead th:last-child {
-            border-right: none;
-        }
-
-        tbody td {
-            padding: 0.6rem 1rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #374151;
-            white-space: nowrap;
-            text-align: center;
-            border-bottom: 1px solid #f1f5f9;
-            border-right: 1.5px solid #e5e7eb;
-        }
-
-        tbody td:last-child {
-            border-right: none;
-        }
-
-        tbody tr.hidden {
-            display: none;
-        }
-
-        .status-btn {
-            padding: 0.3rem 0.65rem;
-            border-radius: 0.35rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-            white-space: nowrap;
-        }
-
-        .status-btn.belum {
-            background: var(--primary-color, #2563eb);
+            font-size: 14px;
             color: white;
-            transition: background 0.3s;
+            flex-shrink: 0;
         }
 
-        .status-btn.sudah {
+        .guest-avatar.blue {
+            background: var(--primary);
+        }
+
+        .guest-avatar.yellow {
+            background: var(--secondary);
+            color: #1a1a2e;
+        }
+
+        .guest-info {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .guest-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            display: block;
+        }
+
+        .guest-address {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .guest-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .guest-details .label {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .guest-details .item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+        }
+
+        .guest-details .item i {
+            font-size: 11px;
+            color: var(--text-secondary);
+            width: 14px;
+        }
+
+        .guest-details .item.rupiah {
+            color: var(--text-secondary);
+        }
+
+        .guest-status {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .toggle-label.done {
+            color: var(--primary);
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
             background: #d1d5db;
-            color: #6b7280;
-            cursor: default;
-            pointer-events: none;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle.active {
+            background: var(--primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
         }
 
         .empty-state {
-            padding: 3rem 1.25rem;
             text-align: center;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #94a3b8;
-            font-size: 0.9rem;
+            padding: 48px 16px;
+            color: #9ca3af;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #d1d5db;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .cs-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(15, 59, 122, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cs-btn:hover {
+            box-shadow: 0 6px 28px rgba(15, 59, 122, 0.4);
+        }
+
+        .cs-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* ================================================================
+                   HISTORY - SLIDE FROM RIGHT
+                   ================================================================ */
+        .history-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .history-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .history-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: var(--white);
+            z-index: 60;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .history-panel.active {
+            transform: translateX(0);
+        }
+
+        .history-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            background: var(--primary);
+            color: white;
+            transition: background 0.4s ease;
+        }
+
+        .history-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .history-header h3 i {
+            margin-right: 10px;
+        }
+
+        .history-header .close-history {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .history-header .close-history:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .history-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 24px 24px 24px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item .time-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-lighter);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 15px;
+            flex-shrink: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .history-item .h-info {
+            flex: 1;
+        }
+
+        .history-item .h-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            display: block;
+        }
+
+        .history-item .h-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .history-item .h-status {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            flex-shrink: 0;
+            transition: color 0.3s;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px 0;
+            color: #9ca3af;
+        }
+
+        .history-empty i {
+            font-size: 36px;
+            color: #d1d5db;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .history-empty p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ================================================================
+                   RESPONSIVE
+                   ================================================================ */
+        @media (max-width: 480px) {
+            .hero {
+                padding: 16px 16px 22px 16px;
+                border-radius: 0 0 20px 20px;
+            }
+
+            .hero-greeting h2 {
+                font-size: 18px;
+            }
+
+            .hero-avatar-wrap,
+            .hero-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .hero-avatar-refresh {
+                width: 16px;
+                height: 16px;
+                font-size: 8px;
+                bottom: -2px;
+                right: -2px;
+            }
+
+            .hero-name h1 {
+                font-size: 14px;
+            }
+
+            .guest-list {
+                padding: 6px 16px 12px 16px;
+            }
+
+            .guest-card {
+                padding: 12px 14px;
+                border-radius: 12px;
+            }
+
+            .guest-row {
+                gap: 10px;
+            }
+
+            .guest-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 12px;
+            }
+
+            .guest-name {
+                font-size: 13px;
+            }
+
+            .guest-details {
+                font-size: 11px;
+                gap: 4px 10px;
+                min-width: 100%;
+            }
+
+            .search-section {
+                padding: 10px 16px 4px 16px;
+            }
+
+            .search-bar {
+                padding: 8px 12px;
+                border-radius: 12px;
+            }
+
+            .cs-btn {
+                width: 48px;
+                height: 48px;
+                bottom: 16px;
+                right: 16px;
+                font-size: 18px;
+            }
+
+            .history-panel {
+                max-width: 100%;
+            }
+
+            .history-header {
+                padding: 16px 18px;
+            }
+
+            .splash-image {
+                aspect-ratio: 16 / 5;
+            }
+        }
+
+        @media (min-width: 600px) {
+            .guest-list {
+                max-width: 720px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .search-section {
+                max-width: 720px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero {
+                padding: 24px 0 32px 0;
+                border-radius: 0 0 32px 32px;
+            }
+
+            .hero-top,
+            .hero-greeting {
+                max-width: 720px;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 0 20px;
+            }
+
+            .guest-details {
+                min-width: 200px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="app">
-        <div class="main-page" id="mainPage">
-            <div class="header" id="mainHeader">
-                <div class="profile-left">
-                    <div class="profile-icon" id="profileIcon" onclick="switchUser()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </div>
-                    <span class="profile-name" id="profileName">REHAN</span>
-                </div>
 
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Cari nama..." oninput="filterTable()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                </div>
-
-                <button class="clock-btn" onclick="openHistory()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                </button>
+    <!-- ============================================================
+    SPLASH SCREEN (A1) - FULL WIDTH, TANPA RADIUS
+    ============================================================ -->
+    <div id="splash">
+        <img src="ebook.webp" alt="E-Book Resepsi" class="splash-image" />
+        <p class="splash-caption">Catatan tamu digital praktis & aman</p>
+        <div class="splash-loading">
+            <div class="splash-balls">
+                <div class="ball ball-blue"></div>
+                <div class="ball ball-yellow"></div>
             </div>
-
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>Bawaan</th>
-                            <th>Beras</th>
-                            <th>Rupiah</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-                <div class="empty-state" id="emptyState" style="display: none;">Belum ada data</div>
-            </div>
-
-            <button class="cs-btn" id="csBtn" onclick="openCS()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
-                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
-                    <circle cx="12" cy="7" r="3"/>
-                    <path d="M9 11c0 1.5 1.3 2.5 3 2.5s3-1 3-2.5"/>
-                </svg>
-            </button>
-        </div>
-
-        <div class="history-page" id="historyPage">
-            <div class="history-header" id="historyHeader">
-                <button class="back-btn" onclick="closeHistory()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                </button>
-                <span class="history-title">History</span>
-                <span class="history-info" id="historyCount">0/20</span>
-            </div>
-            <div class="history-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>Waktu</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyBody"></tbody>
-                </table>
-            </div>
+            <p class="splash-text">LOADING</p>
         </div>
     </div>
 
-    <script>
-        const MAX_HISTORY = 20;
-        const STORAGE_KEY = 'buku_kondangan_user';
+    <!-- ============================================================
+    OVERLAY HISTORY
+    ============================================================ -->
+    <div class="history-overlay" id="historyOverlay" onclick="closeHistory()"></div>
 
-        // ===== DEFAULT DATA =====
-        const defaultData = {
+    <!-- ============================================================
+    HALAMAN UTAMA
+    ============================================================ -->
+    <div id="main">
+
+        <!-- HERO -->
+        <section class="hero" id="heroSection">
+            <div class="hero-top">
+                <div class="hero-user">
+                    <div class="hero-avatar-wrap" onclick="switchUser()" title="Klik untuk ganti user">
+                        <div class="hero-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="hero-avatar-refresh">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+                    </div>
+                    <div class="hero-name">
+                        <h1 id="userNameDisplay">REHAN</h1>
+                        <p><i class="fa-regular fa-circle-check" style="font-size:10px;"></i> <span id="userRoleDisplay">E-Book Resepsi</span></p>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <button class="hero-btn" onclick="openHistory()" title="Riwayat">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="hero-greeting">
+                <h2>Selamat datang</h2>
+                <p><i class="fa-regular fa-calendar"></i> Kelola tamu undangan dengan mudah</p>
+            </div>
+        </section>
+
+        <!-- SEARCH -->
+        <section class="search-section">
+            <div class="search-bar">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari tamu..." oninput="filterTable()" />
+                <button class="search-filter" onclick="resetFilter()" title="Reset">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- GUEST LIST -->
+        <section class="guest-list" id="guestList">
+            <div class="guest-list-header">
+                <h3><i class="fa-regular fa-address-book" style="color:var(--primary);"></i> Daftar Tamu</h3>
+                <span id="jumlahTampil">0 tamu</span>
+            </div>
+            <div id="guestContainer"></div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <i class="fa-regular fa-face-smile"></i>
+                <p>Belum ada tamu terdaftar</p>
+            </div>
+        </section>
+
+        <!-- CS BUTTON -->
+        <button class="cs-btn" id="csBtn" onclick="openCS()">
+            <i class="fa-solid fa-headset"></i>
+        </button>
+    </div>
+
+    <!-- ============================================================
+    HISTORY PANEL
+    ============================================================ -->
+    <div class="history-panel" id="historyPanel">
+        <div class="history-header" id="historyHeader">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Riwayat</h3>
+            <button class="close-history" onclick="closeHistory()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="history-body" id="historyBody"></div>
+    </div>
+
+    <!-- ============================================================
+    SCRIPT
+    ============================================================ -->
+    <script>
+        // ============================================================
+        // SPLASH: 2 DETIK -> FADE OUT
+        // ============================================================
+        setTimeout(function() {
+            var splash = document.getElementById('splash');
+            splash.classList.add('hide');
+            setTimeout(function() {
+                splash.style.display = 'none';
+                document.getElementById('main').classList.add('show');
+            }, 800);
+        }, 2000);
+
+        // ============================================================
+        // DATA LENGKAP (REHAN + GILANG) + CATATAN: '-'
+        // ============================================================
+        var MAX_HISTORY = 20;
+
+        var defaultData = {
             users: {
                 rehan: [
-                    { nama: 'Sakir/Risem', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Amari sopir', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Aka SS', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'H. Camat', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Jaenudin/Wasniti', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Tamin/Kristin', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Arih/Epi', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Muhaemin/Natira', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Wasim/Sukini', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Darsih/Sarwin', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Dasmih/Uus', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Sariman SS', alamat: 'Pengodengan', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Carta/Rastinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Ali/Naib', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Ruminih', alamat: 'Tlakop', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Rasidi/Sumini', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Wahab/Inih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Nani/Kanisem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Kasinah/Darinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Darman/Noviyanti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Endi/Karni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Wayep', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Dayim/Rawiti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Hero/Anah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Sukardi/Sairoh', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Hadi wasnadi/Run', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Warja/Carwitem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Udin/Karwini', alamat: 'Cipedang', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Tarisan/Mumun', alamat: 'Langgen kulon', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Supriadi/Sun', alamat: 'Eretan kulon', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Samsudin/Tani', alamat: 'Kudung waru', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Rumidi/Muidah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Awing/Rilah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Casminih/Krusuk', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sumardi/Daniwen', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Juki/Tisem', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Rastam/Aas', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Sadli/Patonah', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Tarum/Wiwi', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kadiman/Tija', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Warka/Carinih', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Sulaeman/Idin', alamat: 'Karang baru', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Sarwani/Rina', alamat: 'Muntur', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Lebe dariah', alamat: 'Gembreng', bawaan: '-', beras: '-', rupiah: 'Rp 60.000', status: 'belum' },
-                    { nama: 'Karlim/Karnitem', alamat: '-', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Wisnu', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Mamud/Sanira', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Endra/Nining', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Sarkani/ririn', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Wardi/wader', alamat: 'cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sumantri/Taringkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Casnadi/Wayuti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 70.000', status: 'belum' },
-                    { nama: 'Sarip/Sumiyati', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Rastoni/Sartini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Roni/Idah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Yamin/Saliya', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Darkat/Rasini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Opang', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Kodir/Darina', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Mui', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Taskem', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Karnadi/Turina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Raskadi ', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Tarmidi/Teler', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Awe/Kunidah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kasan/Warni', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kastari/Sartia', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Wawi/Udin', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Rois/Anita', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Noto/Sartini', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Tawan/Rokeni', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Kasam/Samini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Maksum/Eni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kasim/Nur', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Ustad juhadi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Darman/Carmi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Imang/Kasih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Mujahidin/Watini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Ato/Nur', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kodir/Rastini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Wakad/Ria', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Warman/Rasiem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Taryono/Nunung', alamat: 'Parean girang', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sutana/Riri', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Deni hendarkum', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'H. Dalim/H. Rasuri', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Darsa/Darnity', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Suleman/Rita', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kartalim/Catem', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Kawi/Maryuna', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Subkih/Jamilah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Riswan/Kasinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Carlim pangsit', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Duladi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Darsim/Tarkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Sakuri/Nurhayati', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Nakillah/Mursinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Warman', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Taram/Soda', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Santo/Mas', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Radin/Sunenti', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Wartam/Damen', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Lilik/tarsim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Muh isro/Sutinan', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Wasjan', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Cali/Kawen', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Daslim/Dasiyah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Casmana/Nurbeda', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Ratiman/Catem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Surnata/Dina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kartalim/Sintem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Wakudin/Wadmi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Dalim/Darsiih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Nawa/Nalem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kardana/Lina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Santrisno/Warni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Radi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Wamidi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Irwan', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sakim/Taringkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sayim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Jeni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Lebe Sodikin', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 150.000', status: 'belum' },
-                    { nama: 'Duloh', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sutinih/Sakun', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Andi/Nuurliya', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Dasmin/Dasitem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Carwita/Nur', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Ilyas', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Sapan/Warniti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', status: 'belum' },
-                    { nama: 'Paik/Karina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Daspan/Carkinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sumardi/Yeni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Warsa/Kustinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Sersan tomo', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Ridwan Goak/Ani', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Wawan/Rena', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Karno/Tarwinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kari/Ini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Suryadi/Cicih .k', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Casam/Teri', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Rano/Murni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Yanto/Eni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Rawan/Dasem', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Tasman RT/Rasni', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Darmin/Sutiah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'H. Wartumi', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Waslime/Neneng', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Carman/Karwi', alamat: 'Muntur', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'H. Narsim/H. Masliyati ', alamat: 'Kr. Poman las', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Narudin/Alfiyah', alamat: 'Kr. Poman las', bawaan: '-', beras: '-', rupiah: 'Rp 80.000', status: 'belum' },
-                    { nama: 'Evan/Risa', alamat: 'BTN. Pengodengan', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', status: 'belum' },
-                    { nama: 'Tarim/Saiti', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Warman/Ratnih', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', status: 'belum' },
-                    { nama: 'Dalim/Danima', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'H. Cantim/H. Kasni', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Darmin/Casih', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Iid/Sugianto', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Kating/Uus', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Warsem/Cartem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Wasmin/Satimah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', status: 'belum' },
-                    { nama: 'Kasan/Tuniah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Latif/Dewi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', status: 'belum' },
-                    { nama: 'Castim/Asiyah', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Carsim/Yuyun', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Jaidin/Cartinah', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Udin baso', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', status: 'belum' },
-                    { nama: 'Cardiwan/Ingkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 100.000', status: 'belum' },
-
-                    { nama: 'Rancas/Wayem', alamat: 'Kr. Sinom', bawaan: 'Sarung', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sartinih/Toni', alamat: 'Cilet', bawaan: 'Bom 2', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wadem', alamat: 'Cilet', bawaan: '2 Bom', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Murni/Rano', alamat: 'Cilet', bawaan: 'Lenga 2 Kg', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Anah/Hero', alamat: 'Cilet', bawaan: 'Bom 2', beras: '7 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Waskiya', alamat: 'Cilet', bawaan: 'Mie 3', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Piah/Karya', alamat: 'Cilet', bawaan: 'Mie 1 Bal', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rasinih/Darkat', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Inah/Nadi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rasdam/Darsinih', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ninik/Tarma', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Karnisem/Nani', alamat: 'Cilet', bawaan: '1 Mie', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Casmana/Nukida', alamat: 'Cilet', bawaan: '4 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kusnia', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rastim/Ucu', alamat: 'Santing', bawaan: '-', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Darni/Jani', alamat: 'Cilet', bawaan: '-', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Suminih/Rasini', alamat: 'Santing', bawaan: '3 bhohun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Mursinah/Nakilah', alamat: 'Cilet', bawaan: '5 Mie sedap', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sanirah/Mamud', alamat: 'Kr. Sinom', bawaan: '1 Mie', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Norvyanti/Darman', alamat: 'Cilet', bawaan: 'Minyak sayur 2 kg', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Runtasi/Wasnadi', alamat: 'Cilet', bawaan: '1 Miea', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ida/Karya', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Taringkem/Sumantri', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sini', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wader/Wardi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Dasirah/Carma', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarwinih/Udin', alamat: 'Cipedang', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Isa/Didi', alamat: 'Cilet', bawaan: '1 Bom', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wastinih/Karma', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kustini/Warsa', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Carwitem/Warja', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Yeye/Amari', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Darina/Darmin', alamat: 'Cilet', bawaan: '1 Bom', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Imas/Santo', alamat: 'Cilet', bawaan: 'Soklin 1 Kg', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rastinah/Carta', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Nining/Endra', alamat: 'Cilet', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sunenti/Supriadi', alamat: 'Eretan Kulon', bawaan: 'Mie 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Dasiyah/Daslim', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'carwitem/Warja', alamat: 'Cilet', bawaan: '3 Bihun', beras: '3 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ibu Ali naib', alamat: 'Cilet', bawaan: 'Mie 3', beras: '20 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'kunah/Yunus', alamat: 'Cilet kidul', bawaan: '4 Bihun', beras: '4Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rasmini/Maman', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kasiiah/Darinih', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tisem/Juadi', alamat: 'Sumur galih', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Aas/Rastam/', alamat: 'Sumur galih', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Patonah/Sadli', alamat: 'Sumur galih', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wiwi/Tarun/', alamat: 'Sumur galih', bawaan: '', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tijah/Kadiman', alamat: 'Sumur galih', bawaan: '', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Carinih/Warka', alamat: 'Sumur galih', bawaan: '', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Juana/Wiwin', alamat: 'Cilet', bawaan: '-', beras: '30 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rastini/Udin', alamat: 'Cilet kidul', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Newi/ncis', alamat: 'Kr. Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kabriya/Kaer', alamat: 'Cilet', bawaan: '1 Mie', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Weri/Tuteng', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sartiah', alamat:'Kr. Sinom ', bawaan: '2 Mie', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Iti/Ilyas', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kodir/Darina', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tamin/Kristin.R', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ingkem/Tarem', alamat: 'Kr. Sinom', bawaan: '1 Mie', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Daris/Joni', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ninih/Sayim', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rokana/Tasmin', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '5Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Watini/Mukta', alamat: 'Kr. Sinom', bawaan: 'Ekonomi 2 Kg', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Liyah/Darlam', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kunari', alamat: 'Cilet', bawaan: '3  Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Muniroh/Tarisan', alamat: 'Langgen', bawaan: '-', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Eni/Yangto', alamat: 'Cilet', bawaan: 'Gula pasie 2 Kg', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sartimah', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rawiti/Dayim', alamat: 'Cilet', bawaan: '2 Mie sedap', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Saliyah/Yamin', alamat: 'Cilet', bawaan: '2 Mie', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wastinih/Warkanih', alamat: 'Kr. Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Riri/Sutana/', alamat: 'Cilet rawa', bawaan: '1 Mie', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarmi/No', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Eti/Arsad', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wasim/Sukini', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Darsih/Sarwin', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tisem/Akmad', alamat: 'Santing', bawaan: '-', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rina/Gosor', alamat: 'Santing', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Santiyah/Kastari', alamat: 'Kr. Sinom', bawaan: 'Dala 2', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kernitem/Karlim', alamat: 'Santing', bawaan: '-', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Turinah/Karnadi', alamat: 'Cilet', bawaan: 'Mie sakura 4', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Taryono/Nunung', alamat: 'Parean girang', bawaan: 'Mie 1 ', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarini/Wartim', alamat: 'Karang sinom', bawaan: '-', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Mui', alamat: 'Kr. Sinom', bawaan: 'Mie 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sukarti/Tarmidi', alamat: 'Santing', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Catem/Alim', alamat: 'Santing', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wadmi/Wakudin', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sumiyanti/Sarip', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Keni/Sarlim', alamat: 'Cilet', bawaan: ' Emi 1', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Soda/Taram', alamat: 'Cilet', bawaan: 'Sohun 1 Bal', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kadmi/Darka', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Warni/Kasan', alamat: 'Santing', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rastem/Rali', alamat: 'Cilet', bawaan: '1 Bom', beras: '3 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wawi/Udin', alamat: 'Kr. Sinom', bawaan: 'Rinso liqwid 1 Pack', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Endang/Juhadi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Watinih/Mujahidin', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kasih/Rasiman', alamat: 'Kr. Lombang', bawaan: '-', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Eli/Kasirah', alamat: 'Cilet', bawaan: 'Gula pasir 2 Kg', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Martinih', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tasminah/Edi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Anita/Rais', alamat: 'Kr. Sinom', bawaan: 'Gula 1 Kg', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'suwarsih/Hj. Riswan', alamat: 'Kr. Sinom', bawaan: 'Mie 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarkainih/Warjaan', alamat: '-', bawaan: '2 Bom', beras: '12 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Noto/Sartinih', alamat: 'Kr. Sinom', bawaan: '-', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'ratinih/Catim', alamat: 'Rr. Sinom', bawaan: '-', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rositi/Sukanah', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Inah/Kardana', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ria/Wakad', alamat: 'Cilet', bawaan: 'Mie 1', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rasiyem/Warmad', alamat: 'Kr. Lombang', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kenah/Tasja', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Karrainah', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Nuni/Ato', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rokenih/Tawan', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rastinih/Kodir', alamat: 'Cilet', bawaan: 'Mie 1', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Maryunah/Kawi', alamat: 'Cilet', bawaan: 'Mie 1', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rita/Sulaeman kempot', alamat: 'Kr.sinom', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Jamilah/subkhi', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Inah/Abdul', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'H.Raswi/H.Dalim', alamat: 'Kr.Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Asiyah/Cartim', alamat: 'Kr. Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ratinih/Wali', alamat: 'Cilet', bawaan: '2 Bom Mie 1 Ball', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Maswah', alamat: 'Cilet', bawaan: '1 Bom', beras: '3 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rena/Wawan', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarinih', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarkem/Darsem', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Dasem/Rawan', alamat: 'Santing', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Neneng/Wastim', alamat: 'Santing', bawaan: '2 Bom', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Danime/Dalim', alamat: 'Kr. Sinom', bawaan: 'Mie 1 Bal', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Reswi/Tasja', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Darniti/Darsa', alamat: 'Kr. Sinom', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sairoh/Sukardi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Agisna/Asep', alamat: 'Cilet', bawaan: '-', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'H. Kasni/H. Cartim', alamat: 'Kr. Sinom', bawaan: 'Mie 1 bal', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sutomo/Darinih', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sutinah/Muh•Siro', alamat: 'Cilet', bawaan: 'Mie sedap 4', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Catem/Ratman', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sutiah/Darmin', alamat: 'Santing', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Alviah/Nurudin', alamat: 'Kr. Poman', bawaan: '-', beras: '12 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarwinah/Karno', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Dinayah/Surnata', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Kaswen/Cali', alamat: 'Cilet', bawaan: 'Biun 3', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Sarniah/Darma', alamat: 'Kr. Sinom', bawaan: 'Biun 4', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Rastini/Tasman', alamat: 'Santing', bawaan: '-', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Darmin/Casih', alamat: 'Kr. Sinom', bawaan: 'Bihun 3', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Nur/Carwita', alamat: 'Cilet', bawaan: 'Bihun 4', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Karinah/Daik', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Carkinih/Dasman', alamat: 'Cilet', bawaan: 'Mie sakura 4', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Ini/Kari', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Cartem(biyung)/Warsim', alamat: 'Cilet', bawaan: 'Bom 2', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tarmi/Mukamad', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Yuyun/Carsim', alamat: 'Kr.Sinom', bawaan: 'Bom 1', beras: '5 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Cartinah/Jaidin', alamat: 'Kr. Sinom', bawaan: 'Bom 2', beras: '4 Liter', rupiah: '-', status: 'belum' },
-
-                    { nama: 'Ola/Toni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Suci/Karminih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Ega', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Rafael/Darman', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Fadilah/Mutinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Ana diana/Wartam', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Nesa/Darkum', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Elin/Sini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp.5 .000', status: 'belum' },
-                    { nama: 'Darinih/Kaswi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Andiika', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Kholil/Nani', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 30.000', status: 'belum' },
-                    { nama: 'Niko/Jen', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Eni/Ingkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Alpin', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Samuel/Warganda/Srii', alamat: 'Gabur wetan', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', status: 'belum' },
-                    { nama: 'Tiwi novi anjani/Samini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Ganda/Zeri', alamat: 'Anjun', bawaan: '-', beras: '-', rupiah: 'Rp. 50.000', status: 'belum' },
-                    { nama: 'Udin/Kunenti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Suryanto/Sukana', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Firil/Lilik', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Yusur/Waran', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Revan/Yuyun', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', status: 'belum' },
-                    { nama: 'Kusnadi/Madiman', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Azam/Mariah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Dini/Erna', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Ini/Gambeng', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Emah/Riyanto', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Putra', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Alif/Sita', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Rizky/Ninah', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Dede/Cani', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Darwanto/Cali', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Tri hapsan/Irna', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Syabilah ajjahra', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Budi/Rita', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Tantri/Eni yanto', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Anton/Daim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Fahmi/Watiah Mujahinin', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Cantika/Lina kardano', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Ikfa nafisah/Mui', alamat: 'Kr. Snom', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Vina/Rusmina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Andika/Casti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Sutisah/Karno', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Idah pejet/', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', status: 'belum' },
-                    { nama: 'Nafis/Ria', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Dian/Dangina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Muh. Tisna/Sutinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Fajri/Bagas', alamat: 'Muntur', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Suprindi/Sunenti', alamat: 'Eretan kulon', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', status: 'belum' },
-                    { nama: 'puput/Anisa', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Antoni/Wastini', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Nita/Talim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' },
-                    { nama: 'Anto/Ratinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Hikmah/Eri', alamat: 'Puntang', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Umam/Ago', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', status: 'belum' },
-                    { nama: 'Rossi/Cendra', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', status: 'belum' },
-                    { nama: 'Labib/Ririn', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 30.000', status: 'belum' },
-                    { nama: 'Balqis/Dewi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', status: 'belum' }
+                    { nama: 'Sakir/Risem', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Amari sopir', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Aka SS', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'H. Camat', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Jaenudin/Wasniti', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tamin/Kristin', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Arih/Epi', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Muhaemin/Natira', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wasim/Sukini', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darsih/Sarwin', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dasmih/Uus', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sariman SS', alamat: 'Pengodengan', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Carta/Rastinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ali/Naib', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ruminih', alamat: 'Tlakop', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rasidi/Sumini', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wahab/Inih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Nani/Kanisem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kasinah/Darinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darman/Noviyanti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Endi/Karni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wayep', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dayim/Rawiti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Hero/Anah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sukardi/Sairoh', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Hadi wasnadi/Run', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warja/Carwitem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Udin/Karwini', alamat: 'Cipedang', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tarisan/Mumun', alamat: 'Langgen kulon', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Supriadi/Sun', alamat: 'Eretan kulon', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Samsudin/Tani', alamat: 'Kudung waru', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rumidi/Muidah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Awing/Rilah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Casminih/Krusuk', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sumardi/Daniwen', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Juki/Tisem', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rastam/Aas', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sadli/Patonah', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tarum/Wiwi', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kadiman/Tija', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warka/Carinih', alamat: 'Sumur galih', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sulaeman/Idin', alamat: 'Karang baru', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sarwani/Rina', alamat: 'Muntur', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Lebe dariah', alamat: 'Gembreng', bawaan: '-', beras: '-', rupiah: 'Rp 60.000', catatan: '-', status: 'belum' },
+                    { nama: 'Karlim/Karnitem', alamat: '-', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wisnu', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Mamud/Sanira', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Endra/Nining', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sarkani/ririn', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wardi/wader', alamat: 'cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sumantri/Taringkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Casnadi/Wayuti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 70.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sarip/Sumiyati', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rastoni/Sartini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Roni/Idah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Yamin/Saliya', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darkat/Rasini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Opang', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kodir/Darina', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Mui', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Taskem', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Karnadi/Turina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Raskadi ', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tarmidi/Teler', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Awe/Kunidah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kasan/Warni', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kastari/Sartia', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wawi/Udin', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rois/Anita', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Noto/Sartini', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tawan/Rokeni', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kasam/Samini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Maksum/Eni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kasim/Nur', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ustad juhadi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darman/Carmi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Imang/Kasih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Mujahidin/Watini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ato/Nur', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kodir/Rastini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wakad/Ria', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warman/Rasiem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Taryono/Nunung', alamat: 'Parean girang', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sutana/Riri', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Deni hendarkum', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'H. Dalim/H. Rasuri', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darsa/Darnity', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Suleman/Rita', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kartalim/Catem', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kawi/Maryuna', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Subkih/Jamilah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Riswan/Kasinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Carlim pangsit', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Duladi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darsim/Tarkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sakuri/Nurhayati', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Nakillah/Mursinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warman', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Taram/Soda', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Santo/Mas', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Radin/Sunenti', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wartam/Damen', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Lilik/tarsim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Muh isro/Sutinan', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wasjan', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Cali/Kawen', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Daslim/Dasiyah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Casmana/Nurbeda', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ratiman/Catem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Surnata/Dina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kartalim/Sintem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wakudin/Wadmi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dalim/Darsiih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Nawa/Nalem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kardana/Lina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Santrisno/Warni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Radi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wamidi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Irwan', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sakim/Taringkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sayim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Jeni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Lebe Sodikin', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 150.000', catatan: '-', status: 'belum' },
+                    { nama: 'Duloh', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sutinih/Sakun', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Andi/Nuurliya', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dasmin/Dasitem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Carwita/Nur', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ilyas', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sapan/Warniti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Paik/Karina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Daspan/Carkinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sumardi/Yeni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warsa/Kustinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sersan tomo', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ridwan Goak/Ani', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wawan/Rena', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Karno/Tarwinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kari/Ini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Suryadi/Cicih .k', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Casam/Teri', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rano/Murni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Yanto/Eni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rawan/Dasem', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tasman RT/Rasni', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darmin/Sutiah', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'H. Wartumi', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Waslime/Neneng', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Carman/Karwi', alamat: 'Muntur', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'H. Narsim/H. Masliyati ', alamat: 'Kr. Poman las', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Narudin/Alfiyah', alamat: 'Kr. Poman las', bawaan: '-', beras: '-', rupiah: 'Rp 80.000', catatan: '-', status: 'belum' },
+                    { nama: 'Evan/Risa', alamat: 'BTN. Pengodengan', bawaan: '-', beras: '-', rupiah: 'Rp 25.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tarim/Saiti', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warman/Ratnih', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dalim/Danima', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'H. Cantim/H. Kasni', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darmin/Casih', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Iid/Sugianto', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kating/Uus', alamat: 'Kebon danas', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Warsem/Cartem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Wasmin/Satimah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kasan/Tuniah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Latif/Dewi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Castim/Asiyah', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Carsim/Yuyun', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Jaidin/Cartinah', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Udin baso', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Cardiwan/Ingkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 100.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rancas/Wayem', alamat: 'Kr. Sinom', bawaan: 'Sarung', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sartinih/Toni', alamat: 'Cilet', bawaan: 'Bom 2', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wadem', alamat: 'Cilet', bawaan: '2 Bom', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Murni/Rano', alamat: 'Cilet', bawaan: 'Lenga 2 Kg', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Anah/Hero', alamat: 'Cilet', bawaan: 'Bom 2', beras: '7 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Waskiya', alamat: 'Cilet', bawaan: 'Mie 3', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Piah/Karya', alamat: 'Cilet', bawaan: 'Mie 1 Bal', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rasinih/Darkat', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Inah/Nadi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rasdam/Darsinih', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ninik/Tarma', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Karnisem/Nani', alamat: 'Cilet', bawaan: '1 Mie', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Casmana/Nukida', alamat: 'Cilet', bawaan: '4 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kusnia', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rastim/Ucu', alamat: 'Santing', bawaan: '-', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Darni/Jani', alamat: 'Cilet', bawaan: '-', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Suminih/Rasini', alamat: 'Santing', bawaan: '3 bhohun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Mursinah/Nakilah', alamat: 'Cilet', bawaan: '5 Mie sedap', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sanirah/Mamud', alamat: 'Kr. Sinom', bawaan: '1 Mie', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Norvyanti/Darman', alamat: 'Cilet', bawaan: 'Minyak sayur 2 kg', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Runtasi/Wasnadi', alamat: 'Cilet', bawaan: '1 Miea', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ida/Karya', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Taringkem/Sumantri', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sini', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wader/Wardi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Dasirah/Carma', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarwinih/Udin', alamat: 'Cipedang', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Isa/Didi', alamat: 'Cilet', bawaan: '1 Bom', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wastinih/Karma', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kustini/Warsa', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Carwitem/Warja', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Yeye/Amari', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Darina/Darmin', alamat: 'Cilet', bawaan: '1 Bom', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Imas/Santo', alamat: 'Cilet', bawaan: 'Soklin 1 Kg', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rastinah/Carta', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Nining/Endra', alamat: 'Cilet', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sunenti/Supriadi', alamat: 'Eretan Kulon', bawaan: 'Mie 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Dasiyah/Daslim', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'carwitem/Warja', alamat: 'Cilet', bawaan: '3 Bihun', beras: '3 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ibu Ali naib', alamat: 'Cilet', bawaan: 'Mie 3', beras: '20 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'kunah/Yunus', alamat: 'Cilet kidul', bawaan: '4 Bihun', beras: '4Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rasmini/Maman', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kasiiah/Darinih', alamat: 'Cilet', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tisem/Juadi', alamat: 'Sumur galih', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Aas/Rastam/', alamat: 'Sumur galih', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Patonah/Sadli', alamat: 'Sumur galih', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wiwi/Tarun/', alamat: 'Sumur galih', bawaan: '', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tijah/Kadiman', alamat: 'Sumur galih', bawaan: '', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Carinih/Warka', alamat: 'Sumur galih', bawaan: '', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Juana/Wiwin', alamat: 'Cilet', bawaan: '-', beras: '30 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rastini/Udin', alamat: 'Cilet kidul', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Newi/ncis', alamat: 'Kr. Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kabriya/Kaer', alamat: 'Cilet', bawaan: '1 Mie', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Weri/Tuteng', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sartiah', alamat:'Kr. Sinom ', bawaan: '2 Mie', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Iti/Ilyas', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kodir/Darina', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tamin/Kristin.R', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ingkem/Tarem', alamat: 'Kr. Sinom', bawaan: '1 Mie', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Daris/Joni', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ninih/Sayim', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rokana/Tasmin', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '5Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Watini/Mukta', alamat: 'Kr. Sinom', bawaan: 'Ekonomi 2 Kg', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Liyah/Darlam', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kunari', alamat: 'Cilet', bawaan: '3  Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Muniroh/Tarisan', alamat: 'Langgen', bawaan: '-', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Eni/Yangto', alamat: 'Cilet', bawaan: 'Gula pasie 2 Kg', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sartimah', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rawiti/Dayim', alamat: 'Cilet', bawaan: '2 Mie sedap', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Saliyah/Yamin', alamat: 'Cilet', bawaan: '2 Mie', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wastinih/Warkanih', alamat: 'Kr. Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Riri/Sutana/', alamat: 'Cilet rawa', bawaan: '1 Mie', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarmi/No', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Eti/Arsad', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wasim/Sukini', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Darsih/Sarwin', alamat: 'Kebon danas', bawaan: '-', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tisem/Akmad', alamat: 'Santing', bawaan: '-', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rina/Gosor', alamat: 'Santing', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Santiyah/Kastari', alamat: 'Kr. Sinom', bawaan: 'Dala 2', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kernitem/Karlim', alamat: 'Santing', bawaan: '-', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Turinah/Karnadi', alamat: 'Cilet', bawaan: 'Mie sakura 4', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Taryono/Nunung', alamat: 'Parean girang', bawaan: 'Mie 1 ', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarini/Wartim', alamat: 'Karang sinom', bawaan: '-', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Mui', alamat: 'Kr. Sinom', bawaan: 'Mie 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sukarti/Tarmidi', alamat: 'Santing', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Catem/Alim', alamat: 'Santing', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wadmi/Wakudin', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sumiyanti/Sarip', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Keni/Sarlim', alamat: 'Cilet', bawaan: ' Emi 1', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Soda/Taram', alamat: 'Cilet', bawaan: 'Sohun 1 Bal', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kadmi/Darka', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Warni/Kasan', alamat: 'Santing', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rastem/Rali', alamat: 'Cilet', bawaan: '1 Bom', beras: '3 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wawi/Udin', alamat: 'Kr. Sinom', bawaan: 'Rinso liqwid 1 Pack', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Endang/Juhadi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Watinih/Mujahidin', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kasih/Rasiman', alamat: 'Kr. Lombang', bawaan: '-', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Eli/Kasirah', alamat: 'Cilet', bawaan: 'Gula pasir 2 Kg', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Martinih', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tasminah/Edi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Anita/Rais', alamat: 'Kr. Sinom', bawaan: 'Gula 1 Kg', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'suwarsih/Hj. Riswan', alamat: 'Kr. Sinom', bawaan: 'Mie 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarkainih/Warjaan', alamat: '-', bawaan: '2 Bom', beras: '12 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Noto/Sartinih', alamat: 'Kr. Sinom', bawaan: '-', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'ratinih/Catim', alamat: 'Rr. Sinom', bawaan: '-', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rositi/Sukanah', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Inah/Kardana', alamat: 'Cilet', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ria/Wakad', alamat: 'Cilet', bawaan: 'Mie 1', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rasiyem/Warmad', alamat: 'Kr. Lombang', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kenah/Tasja', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Karrainah', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Nuni/Ato', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rokenih/Tawan', alamat: 'Kr. Sinom', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rastinih/Kodir', alamat: 'Cilet', bawaan: 'Mie 1', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Maryunah/Kawi', alamat: 'Cilet', bawaan: 'Mie 1', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rita/Sulaeman kempot', alamat: 'Kr.sinom', bawaan: '2 Bom', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Jamilah/subkhi', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Inah/Abdul', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'H.Raswi/H.Dalim', alamat: 'Kr.Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Asiyah/Cartim', alamat: 'Kr. Sinom', bawaan: '4 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ratinih/Wali', alamat: 'Cilet', bawaan: '2 Bom Mie 1 Ball', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Maswah', alamat: 'Cilet', bawaan: '1 Bom', beras: '3 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rena/Wawan', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarinih', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarkem/Darsem', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Dasem/Rawan', alamat: 'Santing', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Neneng/Wastim', alamat: 'Santing', bawaan: '2 Bom', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Danime/Dalim', alamat: 'Kr. Sinom', bawaan: 'Mie 1 Bal', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Reswi/Tasja', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Darniti/Darsa', alamat: 'Kr. Sinom', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sairoh/Sukardi', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Agisna/Asep', alamat: 'Cilet', bawaan: '-', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'H. Kasni/H. Cartim', alamat: 'Kr. Sinom', bawaan: 'Mie 1 bal', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sutomo/Darinih', alamat: 'Cilet', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sutinah/Muh•Siro', alamat: 'Cilet', bawaan: 'Mie sedap 4', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Catem/Ratman', alamat: 'Cilet', bawaan: '3 Bihun', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sutiah/Darmin', alamat: 'Santing', bawaan: '1 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Alviah/Nurudin', alamat: 'Kr. Poman', bawaan: '-', beras: '12 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarwinah/Karno', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Dinayah/Surnata', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Kaswen/Cali', alamat: 'Cilet', bawaan: 'Biun 3', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Sarniah/Darma', alamat: 'Kr. Sinom', bawaan: 'Biun 4', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Rastini/Tasman', alamat: 'Santing', bawaan: '-', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Darmin/Casih', alamat: 'Kr. Sinom', bawaan: 'Bihun 3', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Nur/Carwita', alamat: 'Cilet', bawaan: 'Bihun 4', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Karinah/Daik', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Carkinih/Dasman', alamat: 'Cilet', bawaan: 'Mie sakura 4', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ini/Kari', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Cartem(biyung)/Warsim', alamat: 'Cilet', bawaan: 'Bom 2', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tarmi/Mukamad', alamat: 'Cilet', bawaan: 'Bom 1', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Yuyun/Carsim', alamat: 'Kr.Sinom', bawaan: 'Bom 1', beras: '5 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Cartinah/Jaidin', alamat: 'Kr. Sinom', bawaan: 'Bom 2', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Ola/Toni', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Suci/Karminih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ega', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rafael/Darman', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Fadilah/Mutinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ana diana/Wartam', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Nesa/Darkum', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Elin/Sini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp.5 .000', catatan: '-', status: 'belum' },
+                    { nama: 'Darinih/Kaswi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Andiika', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kholil/Nani', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Niko/Jen', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Eni/Ingkem', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Alpin', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Samuel/Warganda/Srii', alamat: 'Gabur wetan', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tiwi novi anjani/Samini', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ganda/Zeri', alamat: 'Anjun', bawaan: '-', beras: '-', rupiah: 'Rp. 50.000', catatan: '-', status: 'belum' },
+                    { nama: 'Udin/Kunenti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Suryanto/Sukana', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Firil/Lilik', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Yusur/Waran', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Revan/Yuyun', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Kusnadi/Madiman', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Azam/Mariah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dini/Erna', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ini/Gambeng', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Emah/Riyanto', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Putra', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Alif/Sita', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rizky/Ninah', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dede/Cani', alamat: 'Santing', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Darwanto/Cali', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tri hapsan/Irna', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Syabilah ajjahra', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Budi/Rita', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Tantri/Eni yanto', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Anton/Daim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Fahmi/Watiah Mujahinin', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Cantika/Lina kardano', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Ikfa nafisah/Mui', alamat: 'Kr. Snom', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Vina/Rusmina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Andika/Casti', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Sutisah/Karno', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Idah pejet/', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'Nafis/Ria', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Dian/Dangina', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Muh. Tisna/Sutinah', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Fajri/Bagas', alamat: 'Muntur', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Suprindi/Sunenti', alamat: 'Eretan kulon', bawaan: '-', beras: '-', rupiah: 'Rp. 15.000', catatan: '-', status: 'belum' },
+                    { nama: 'puput/Anisa', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Antoni/Wastini', alamat: 'Kr. Sinom', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Nita/Talim', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' },
+                    { nama: 'Anto/Ratinih', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Hikmah/Eri', alamat: 'Puntang', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Umam/Ago', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 5.000', catatan: '-', status: 'belum' },
+                    { nama: 'Rossi/Cendra', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 10.000', catatan: '-', status: 'belum' },
+                    { nama: 'Labib/Ririn', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 30.000', catatan: '-', status: 'belum' },
+                    { nama: 'Balqis/Dewi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' }
                 ],
                 gilang: [
-                    { nama: 'Anik', alamat: '-', bawaan: 'Minyak fortune 4 Liter', beras: '25 Kilogram', rupiah: '-', status: 'belum' },
-                    { nama: 'H. Ramini', alamat: '-', bawaan: 'Minyak 6 Liter, Gula pasir 5 Kg, mie kondangan 2.', beras: '25 Kilogram', rupiah: '-', status: 'belum' },
-                    { nama: 'H. Wanira', alamat: '-', bawaan: 'Minyak kita 2 Liter', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tetiri', alamat: '-', bawaan: 'Mie 1 Bal', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Tina', alamat: '-', bawaan: '-', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Turina/Kasran', alamat: '-', bawaan: 'Me 2 Bal', beras: '12 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Dumi', alamat: '-', bawaan: 'Gula alfa 3 Kg, Teh jangkar 2.', beras: '25 kilogram', rupiah: '-', status: 'belum' },
-                    { nama: 'Wiwik/Andika', alamat: '-', bawaan: 'Indomie 10', beras: '10 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Jariyah/Udi', alamat: '-', bawaan: 'Liquid 1 Pack', beras: '6 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Dinginan/Waya', alamat: '-', bawaan: 'Mie 1 Bal', beras: '8 Liter', rupiah: '-', status: 'belum' },
-                    { nama: 'Wa. Pia/Karyo', alamat: '-', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', status: 'belum' },
-                    
+                    { nama: 'Anik', alamat: '-', bawaan: 'Minyak fortune 4 Liter', beras: '25 Kilogram', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'H. Ramini', alamat: '-', bawaan: 'Minyak 6 Liter, Gula pasir 5 Kg, mie kondangan 2.', beras: '25 Kilogram', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'H. Wanira', alamat: '-', bawaan: 'Minyak kita 2 Liter', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tetiri', alamat: '-', bawaan: 'Mie 1 Bal', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Tina', alamat: '-', bawaan: '-', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Turina/Kasran', alamat: '-', bawaan: 'Me 2 Bal', beras: '12 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Dumi', alamat: '-', bawaan: 'Gula alfa 3 Kg, Teh jangkar 2.', beras: '25 kilogram', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wiwik/Andika', alamat: '-', bawaan: 'Indomie 10', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Jariyah/Udi', alamat: '-', bawaan: 'Liquid 1 Pack', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Dinginan/Waya', alamat: '-', bawaan: 'Mie 1 Bal', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
+                    { nama: 'Wa. Pia/Karyo', alamat: '-', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' }
                 ]
             }
         };
 
-        const userColors = {
-            rehan: '#2563eb',
-            gilang: '#22c55e'
-        };
-
-        // ===== DATA AKTIF (TIDAK DISIMPAN KE LOCALSTORAGE) =====
-        let appData = {
+        var appData = {
             users: JSON.parse(JSON.stringify(defaultData.users)),
-            history: {
-                rehan: [],
-                gilang: []
-            }
+            history: { rehan: [], gilang: [] }
         };
 
-        // Hanya simpan currentUser ke localStorage
-        function loadCurrentUser() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            return (saved === 'rehan' || saved === 'gilang') ? saved : 'rehan';
+        var currentUser = 'rehan';
+
+        // ============================================================
+        // SWITCH USER
+        // ============================================================
+        function switchUser() {
+            var newUser = currentUser === 'rehan' ? 'gilang' : 'rehan';
+            currentUser = newUser;
+
+            var mainEl = document.getElementById('main');
+            if (currentUser === 'gilang') {
+                mainEl.classList.add('theme-gilang');
+            } else {
+                mainEl.classList.remove('theme-gilang');
+            }
+
+            var displayName = currentUser === 'rehan' ? 'REHAN' : 'GILANG';
+
+            document.getElementById('userNameDisplay').textContent = displayName;
+
+            var csBtn = document.getElementById('csBtn');
+            csBtn.style.background = 'var(--primary)';
+
+            renderGuests();
+            renderHistory();
+            closeHistory();
         }
 
-        function saveCurrentUser(user) {
-            localStorage.setItem(STORAGE_KEY, user);
-        }
-
-        let currentUser = loadCurrentUser();
-
-        function applyTheme(user) {
-            const color = userColors[user];
-            document.documentElement.style.setProperty('--primary-color', color);
-            document.getElementById('mainHeader').style.background = color;
-            document.getElementById('historyHeader').style.background = color;
-            document.getElementById('csBtn').style.background = color;
-            document.getElementById('csBtn').style.boxShadow = `0 4px 16px ${color}66`;
-            document.getElementById('profileName').textContent = user === 'rehan' ? 'REHAN' : 'GILANG';
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            const emptyState = document.getElementById('emptyState');
-            const data = appData.users[currentUser];
+        // ============================================================
+        // RENDER GUEST
+        // ============================================================
+        function renderGuests() {
+            var container = document.getElementById('guestContainer');
+            var empty = document.getElementById('emptyState');
+            var data = appData.users[currentUser] || [];
 
             if (data.length === 0) {
-                tbody.innerHTML = '';
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-                tbody.innerHTML = data.map(item => `
-                    <tr data-nama="${item.nama}" data-alamat="${item.alamat}">
-                        <td>${item.nama}</td>
-                        <td>${item.alamat}</td>
-                        <td>${item.bawaan}</td>
-                        <td>${item.beras}</td>
-                        <td>${item.rupiah}</td>
-                        <td>
-                            <button class="status-btn ${item.status}"
-                                style="background: ${item.status === 'belum' ? userColors[currentUser] : '#d1d5db'}; color: ${item.status === 'belum' ? 'white' : '#6b7280'};"
-                                onclick="toggleStatus(this, '${item.nama}', '${item.alamat}')">
-                                ${item.status === 'belum' ? 'Belum' : 'Sudah'}
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                document.getElementById('jumlahTampil').textContent = '0 tamu';
+                return;
             }
 
+            empty.style.display = 'none';
+            document.getElementById('jumlahTampil').textContent = data.length + ' tamu';
+
+            var html = '';
+            var warna = ['blue', 'yellow'];
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                var inisial = item.nama.substring(0, 2).toUpperCase();
+                var warnaAva = warna[i % 2];
+                var statusText = item.status === 'belum' ? 'Belum' : 'Sudah';
+                var statusClass = item.status === 'belum' ? '' : 'active';
+
+                html += '<div class="guest-card" data-nama="' + item.nama + '" data-alamat="' + item.alamat + '">';
+                html += '<div class="guest-row">';
+                html += '<div class="guest-avatar ' + warnaAva + '">' + inisial + '</div>';
+                html += '<div class="guest-info">';
+                html += '<span class="guest-name">' + item.nama + '</span>';
+                html += '<span class="guest-address"><i class="fa-solid fa-globe" style="font-size:10px;"></i> ' + item.alamat + '</span>';
+                html += '</div>';
+
+                html += '<div class="guest-details">';
+                html += '<span class="item"><i class="fa-solid fa-box"></i> <span class="label">Bawaan:</span> ' + item.bawaan + '</span>';
+                html += '<span class="item"><i class="fa-solid fa-wheat-awn"></i> <span class="label">Beras:</span> ' + item.beras + '</span>';
+                html += '<span class="item rupiah"><i class="fa-solid fa-money-bill-wave"></i> <span class="label">Rupiah:</span> ' + item.rupiah + '</span>';
+                html += '<span class="item"><i class="fa-regular fa-pen-to-square"></i> <span class="label">Catatan:</span> ' + item.catatan + '</span>';
+                html += '</div>';
+
+                html += '<div class="guest-status">';
+                html += '<div class="toggle-wrap">';
+                html += '<span class="toggle-label ' + (item.status === 'sudah' ? 'done' : '') + '">' + statusText + '</span>';
+                html += '<button class="toggle ' + statusClass + '" ';
+                html += 'onclick="toggleStatus(this, \'' + item.nama + '\', \'' + item.alamat + '\')">';
+                html += '</button>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
             document.getElementById('searchInput').value = '';
         }
 
-        function switchUser() {
-            currentUser = currentUser === 'rehan' ? 'gilang' : 'rehan';
-            saveCurrentUser(currentUser);
-            applyTheme(currentUser);
-            renderTable();
-            renderHistory();
-        }
-
+        // ============================================================
+        // TOGGLE STATUS
+        // ============================================================
         function getNow() {
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${day}/${month}/${year} ${hours}:${minutes}`;
+            var d = new Date();
+            var day = String(d.getDate()).padStart(2, '0');
+            var mon = String(d.getMonth() + 1).padStart(2, '0');
+            var yr = d.getFullYear();
+            var hr = String(d.getHours()).padStart(2, '0');
+            var min = String(d.getMinutes()).padStart(2, '0');
+            return day + '/' + mon + '/' + yr + ' ' + hr + ':' + min;
         }
 
         function toggleStatus(btn, nama, alamat) {
-            if (btn.classList.contains('belum')) {
-                const userDataArr = appData.users[currentUser];
-                const entry = userDataArr.find(d => d.nama === nama && d.alamat === alamat);
-                if (entry) {
-                    entry.status = 'sudah';
+            if (btn.disabled) return;
+            btn.disabled = true;
+
+            var dataArr = appData.users[currentUser];
+            var entry = null;
+            for (var i = 0; i < dataArr.length; i++) {
+                if (dataArr[i].nama === nama && dataArr[i].alamat === alamat) {
+                    entry = dataArr[i];
+                    break;
                 }
-
-                btn.classList.remove('belum');
-                btn.classList.add('sudah');
-                btn.textContent = 'Sudah';
-                btn.style.background = '#d1d5db';
-                btn.style.color = '#6b7280';
-                btn.style.cursor = 'default';
-                btn.style.pointerEvents = 'none';
-
-                const waktu = getNow();
-                appData.history[currentUser].unshift({ nama, alamat, waktu, status: 'Sudah' });
-                if (appData.history[currentUser].length > MAX_HISTORY) {
-                    appData.history[currentUser] = appData.history[currentUser].slice(0, MAX_HISTORY);
-                }
-
-                renderHistory();
-            }
-        }
-
-        function renderHistory() {
-            const historyBody = document.getElementById('historyBody');
-            const historyCount = document.getElementById('historyCount');
-            const currentHistory = appData.history[currentUser];
-
-            historyCount.textContent = `${currentHistory.length}/${MAX_HISTORY}`;
-
-            if (currentHistory.length === 0) {
-                historyBody.innerHTML = `<tr class="history-empty-row"><td colspan="4" class="history-empty">Belum ada riwayat</td></tr>`;
-                return;
             }
 
-            historyBody.innerHTML = currentHistory.map(item => `
-                <tr>
-                    <td>${item.nama}</td>
-                    <td>${item.alamat}</td>
-                    <td>${item.waktu}</td>
-                    <td>${item.status}</td>
-                </tr>
-            `).join('');
-        }
+            var wrap = btn.parentElement;
+            var label = wrap.querySelector('.toggle-label');
+            var waktu = getNow();
+            var historyArr = appData.history[currentUser];
 
-        function filterTable() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toLowerCase().trim();
-            const tbody = document.getElementById('tableBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
+            if (entry.status === 'belum') {
+                entry.status = 'sudah';
+                btn.classList.add('active');
+                label.textContent = 'Sudah';
+                label.classList.add('done');
 
-            if (filter === '') {
-                rows.forEach(row => {
-                    row.classList.remove('hidden');
-                    tbody.appendChild(row);
+                historyArr.unshift({
+                    nama: nama,
+                    alamat: alamat,
+                    waktu: waktu,
+                    status: 'Sudah'
                 });
+
+            } else {
+                entry.status = 'belum';
+                btn.classList.remove('active');
+                label.textContent = 'Belum';
+                label.classList.remove('done');
+
+                for (var i = 0; i < historyArr.length; i++) {
+                    if (historyArr[i].nama === nama && historyArr[i].alamat === alamat) {
+                        historyArr.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            if (historyArr.length > MAX_HISTORY) {
+                appData.history[currentUser] = historyArr.slice(0, MAX_HISTORY);
+            }
+
+            renderGuests();
+            renderHistory();
+
+            setTimeout(function() {
+                btn.disabled = false;
+            }, 300);
+        }
+
+        // ============================================================
+        // RENDER HISTORY
+        // ============================================================
+        function renderHistory() {
+            var body = document.getElementById('historyBody');
+            var hist = appData.history[currentUser] || [];
+
+            if (hist.length === 0) {
+                body.innerHTML = '<div class="history-empty">' +
+                    '<i class="fa-regular fa-clock"></i>' +
+                    '<p>Belum ada riwayat</p>' +
+                    '</div>';
                 return;
             }
 
-            const matchRows = [];
-            const noMatchRows = [];
-
-            rows.forEach(row => {
-                const nama = row.getAttribute('data-nama').toLowerCase();
-                if (nama.includes(filter)) {
-                    matchRows.push(row);
-                } else {
-                    noMatchRows.push(row);
-                }
-            });
-
-            matchRows.sort((a, b) => {
-                const namaA = a.getAttribute('data-nama').toLowerCase();
-                const namaB = b.getAttribute('data-nama').toLowerCase();
-                const startsA = namaA.startsWith(filter);
-                const startsB = namaB.startsWith(filter);
-                if (startsA && !startsB) return -1;
-                if (!startsA && startsB) return 1;
-                return namaA.localeCompare(namaB);
-            });
-
-            tbody.innerHTML = '';
-
-            matchRows.forEach(row => {
-                row.classList.remove('hidden');
-                tbody.appendChild(row);
-            });
-
-            noMatchRows.forEach(row => {
-                row.classList.add('hidden');
-                tbody.appendChild(row);
-            });
+            var html = '';
+            for (var i = 0; i < hist.length; i++) {
+                var item = hist[i];
+                html += '<div class="history-item">';
+                html += '<div class="time-icon"><i class="fa-regular fa-clock"></i></div>';
+                html += '<div class="h-info">';
+                html += '<span class="h-name">' + item.nama + '</span>';
+                html += '<span class="h-detail"><i class="fa-solid fa-globe"></i> ' + item.alamat +
+                    ' • ' + item.waktu + '</span>';
+                html += '</div>';
+                html += '<span class="h-status"><i class="fa-regular fa-circle-check"></i> ' + item.status +
+                    '</span>';
+                html += '</div>';
+            }
+            body.innerHTML = html;
         }
 
+        // ============================================================
+        // SEARCH
+        // ============================================================
+        function filterTable() {
+            var input = document.getElementById('searchInput');
+            var filter = input.value.toLowerCase().trim();
+            var cards = document.querySelectorAll('.guest-card');
+
+            var visible = 0;
+            for (var i = 0; i < cards.length; i++) {
+                var nama = cards[i].getAttribute('data-nama').toLowerCase();
+                if (filter === '' || nama.indexOf(filter) !== -1) {
+                    cards[i].style.display = 'block';
+                    visible++;
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
+
+            document.getElementById('jumlahTampil').textContent = visible + ' tamu';
+
+            var empty = document.getElementById('emptyState');
+            if (visible === 0 && filter !== '') {
+                empty.style.display = 'block';
+                empty.innerHTML =
+                    '<i class="fa-regular fa-face-sad-tear"></i><p>Tidak ada tamu dengan nama "' + filter + '"</p>';
+            } else if (visible === 0) {
+                empty.style.display = 'block';
+                empty.innerHTML = '<i class="fa-regular fa-face-smile"></i><p>Belum ada tamu terdaftar</p>';
+            } else {
+                empty.style.display = 'none';
+            }
+        }
+
+        function resetFilter() {
+            document.getElementById('searchInput').value = '';
+            filterTable();
+        }
+
+        // ============================================================
+        // HISTORY
+        // ============================================================
         function openHistory() {
             renderHistory();
-            document.getElementById('mainPage').classList.add('hidden');
-            document.getElementById('historyPage').classList.add('active');
+            document.getElementById('historyPanel').classList.add('active');
+            document.getElementById('historyOverlay').classList.add('active');
         }
 
         function closeHistory() {
-            document.getElementById('mainPage').classList.remove('hidden');
-            document.getElementById('historyPage').classList.remove('active');
+            document.getElementById('historyPanel').classList.remove('active');
+            document.getElementById('historyOverlay').classList.remove('active');
         }
 
+        // ============================================================
+        // CS
+        // ============================================================
         function openCS() {
-            const phone = '6289684219904';
-            const message = 'ada bug nih ges coba maintenance lagi';
-            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+            var phone = '6289684219904';
+            var msg = 'Halo CS E-Book Resepsi, saya mau tanya/menyampaikan sesuatu.';
+            window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
         }
 
-        applyTheme(currentUser);
-        renderTable();
+        // ============================================================
+        // INIT
+        // ============================================================
+        renderGuests();
         renderHistory();
     </script>
+
 </body>
 </html>
