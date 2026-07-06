@@ -21,6 +21,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent !important;
         }
 
         html,
@@ -32,6 +33,7 @@
             color: #1a1a2e;
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent !important;
         }
 
         :root {
@@ -48,7 +50,6 @@
             --shadow: 0 4px 20px rgba(15, 59, 122, 0.08);
         }
 
-        /* GILANG JUGA BIRU (SAMA KAYA REHAN) */
         .theme-gilang {
             --primary: #0f3b7a;
             --primary-light: #1a5bb5;
@@ -56,8 +57,24 @@
             --shadow: 0 4px 20px rgba(15, 59, 122, 0.08);
         }
 
+        button,
+        input,
+        .toggle,
+        .hero-avatar-wrap,
+        .guest-card,
+        .cs-btn,
+        .history-back,
+        .close-history,
+        .search-filter {
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            outline: none !important;
+        }
+
         /* ================================================================
-                   SPLASH SCREEN (A1) - FULL WIDTH, TANPA RADIUS
+                   SPLASH SCREEN (A1)
                    ================================================================ */
         #splash {
             position: fixed;
@@ -193,7 +210,6 @@
             opacity: 1;
         }
 
-        /* ---------- HERO ---------- */
         .hero {
             background: linear-gradient(145deg, var(--primary) 0%, var(--primary-light) 100%);
             padding: 20px 20px 28px 20px;
@@ -356,7 +372,6 @@
             margin-top: 2px;
         }
 
-        /* ---------- SEARCH ---------- */
         .search-section {
             padding: 14px 20px 6px 20px;
             flex-shrink: 0;
@@ -412,10 +427,9 @@
             color: var(--primary);
         }
 
-        /* ---------- GUEST LIST ---------- */
         .guest-list {
             flex: 1;
-            padding: 8px 20px 16px 20px;
+            padding: 0 20px 16px 20px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -437,7 +451,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            padding: 12px 0 10px 0;
+            background: var(--bg);
+            position: sticky;
+            top: 0;
+            z-index: 5;
         }
 
         .guest-list-header h3 {
@@ -648,7 +666,7 @@
         }
 
         /* ================================================================
-                   HISTORY - SLIDE FROM RIGHT
+                   HISTORY
                    ================================================================ */
         .history-overlay {
             position: fixed;
@@ -747,18 +765,26 @@
             border-bottom: none;
         }
 
-        .history-item .time-icon {
+        .history-avatar {
             width: 40px;
             height: 40px;
-            background: var(--primary-lighter);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-size: 15px;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
             flex-shrink: 0;
-            transition: background 0.3s, color 0.3s;
+        }
+
+        .history-avatar.blue {
+            background: var(--primary);
+        }
+
+        .history-avatar.yellow {
+            background: var(--secondary);
+            color: #1a1a2e;
         }
 
         .history-item .h-info {
@@ -837,7 +863,11 @@
             }
 
             .guest-list {
-                padding: 6px 16px 12px 16px;
+                padding: 0 16px 12px 16px;
+            }
+
+            .guest-list-header {
+                padding: 10px 0 8px 0;
             }
 
             .guest-card {
@@ -890,6 +920,12 @@
                 padding: 16px 18px;
             }
 
+            .history-avatar {
+                width: 34px;
+                height: 34px;
+                font-size: 12px;
+            }
+
             .splash-image {
                 aspect-ratio: 16 / 5;
             }
@@ -934,7 +970,7 @@
 <body>
 
     <!-- ============================================================
-    SPLASH SCREEN (A1) - FULL WIDTH, TANPA RADIUS
+    SPLASH SCREEN (A1)
     ============================================================ -->
     <div id="splash">
         <img src="ebook.webp" alt="E-Book Resepsi" class="splash-image" />
@@ -1000,7 +1036,7 @@
 
         <!-- GUEST LIST -->
         <section class="guest-list" id="guestList">
-            <div class="guest-list-header">
+            <div class="guest-list-header" id="guestListHeader">
                 <h3><i class="fa-regular fa-address-book" style="color:var(--primary);"></i> Daftar Tamu</h3>
                 <span id="jumlahTampil">0 tamu</span>
             </div>
@@ -1047,7 +1083,12 @@
         }, 2000);
 
         // ============================================================
-        // DATA LENGKAP (REHAN + GILANG) + CATATAN: '-'
+        // LOCAL STORAGE KEY
+        // ============================================================
+        var STORAGE_KEY = 'ebook_resepsi_data';
+
+        // ============================================================
+        // DEFAULT DATA
         // ============================================================
         var MAX_HISTORY = 20;
 
@@ -1434,26 +1475,57 @@
                     { nama: 'Balqis/Dewi', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. 20.000', catatan: '-', status: 'belum' }
                 ],
                 gilang: [
-                    { nama: 'Anik', alamat: '-', bawaan: 'Minyak fortune 4 Liter', beras: '25 Kilogram', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'H. Ramini', alamat: '-', bawaan: 'Minyak 6 Liter, Gula pasir 5 Kg, mie kondangan 2.', beras: '25 Kilogram', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'H. Wanira', alamat: '-', bawaan: 'Minyak kita 2 Liter', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Tetiri', alamat: '-', bawaan: 'Mie 1 Bal', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Tina', alamat: '-', bawaan: '-', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Turina/Kasran', alamat: '-', bawaan: 'Me 2 Bal', beras: '12 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Dumi', alamat: '-', bawaan: 'Gula alfa 3 Kg, Teh jangkar 2.', beras: '25 kilogram', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Wiwik/Andika', alamat: '-', bawaan: 'Indomie 10', beras: '10 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Jariyah/Udi', alamat: '-', bawaan: 'Liquid 1 Pack', beras: '6 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Dinginan/Waya', alamat: '-', bawaan: 'Mie 1 Bal', beras: '8 Liter', rupiah: '-', catatan: '-', status: 'belum' },
-                    { nama: 'Wa. Pia/Karyo', alamat: '-', bawaan: '2 Bom', beras: '4 Liter', rupiah: '-', catatan: '-', status: 'belum' }
+                    { nama: '/', alamat: 'Cilet', bawaan: '-', beras: '-', rupiah: 'Rp. .000', catatan: '-', status: 'belum' },
                 ]
+            },
+            history: {
+                rehan: [],
+                gilang: []
             }
         };
 
-        var appData = {
-            users: JSON.parse(JSON.stringify(defaultData.users)),
-            history: { rehan: [], gilang: [] }
-        };
+        // ============================================================
+        // LOAD / SAVE DATA - FIX BUG
+        // ============================================================
+        function loadData() {
+            try {
+                var saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    // Pastikan semua user ada
+                    var result = {
+                        users: {},
+                        history: {}
+                    };
+                    for (var user in defaultData.users) {
+                        if (parsed.users && parsed.users[user]) {
+                            result.users[user] = parsed.users[user];
+                        } else {
+                            result.users[user] = JSON.parse(JSON.stringify(defaultData.users[user]));
+                        }
+                        if (parsed.history && parsed.history[user]) {
+                            result.history[user] = parsed.history[user];
+                        } else {
+                            result.history[user] = [];
+                        }
+                    }
+                    return result;
+                }
+            } catch (e) {
+                console.warn('LocalStorage error, using default data');
+            }
+            return JSON.parse(JSON.stringify(defaultData));
+        }
 
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            } catch (e) {
+                console.warn('Failed to save to localStorage');
+            }
+        }
+
+        var appData = loadData();
         var currentUser = 'rehan';
 
         // ============================================================
@@ -1471,7 +1543,6 @@
             }
 
             var displayName = currentUser === 'rehan' ? 'REHAN' : 'GILANG';
-
             document.getElementById('userNameDisplay').textContent = displayName;
 
             var csBtn = document.getElementById('csBtn');
@@ -1540,7 +1611,7 @@
         }
 
         // ============================================================
-        // TOGGLE STATUS
+        // TOGGLE STATUS + SAVE
         // ============================================================
         function getNow() {
             var d = new Date();
@@ -1552,9 +1623,12 @@
             return day + '/' + mon + '/' + yr + ' ' + hr + ':' + min;
         }
 
+        var toggleDebounce = {};
+
         function toggleStatus(btn, nama, alamat) {
-            if (btn.disabled) return;
-            btn.disabled = true;
+            var key = nama + '|' + alamat;
+            if (toggleDebounce[key]) return;
+            toggleDebounce[key] = true;
 
             var dataArr = appData.users[currentUser];
             var entry = null;
@@ -1563,6 +1637,11 @@
                     entry = dataArr[i];
                     break;
                 }
+            }
+
+            if (!entry) {
+                toggleDebounce[key] = false;
+                return;
             }
 
             var wrap = btn.parentElement;
@@ -1589,9 +1668,9 @@
                 label.textContent = 'Belum';
                 label.classList.remove('done');
 
-                for (var i = 0; i < historyArr.length; i++) {
-                    if (historyArr[i].nama === nama && historyArr[i].alamat === alamat) {
-                        historyArr.splice(i, 1);
+                for (var j = 0; j < historyArr.length; j++) {
+                    if (historyArr[j].nama === nama && historyArr[j].alamat === alamat) {
+                        historyArr.splice(j, 1);
                         break;
                     }
                 }
@@ -1601,11 +1680,13 @@
                 appData.history[currentUser] = historyArr.slice(0, MAX_HISTORY);
             }
 
+            saveData();
+
             renderGuests();
             renderHistory();
 
             setTimeout(function() {
-                btn.disabled = false;
+                toggleDebounce[key] = false;
             }, 300);
         }
 
@@ -1625,10 +1706,14 @@
             }
 
             var html = '';
+            var warna = ['blue', 'yellow'];
             for (var i = 0; i < hist.length; i++) {
                 var item = hist[i];
+                var inisial = item.nama.substring(0, 2).toUpperCase();
+                var warnaAva = warna[i % 2];
+
                 html += '<div class="history-item">';
-                html += '<div class="time-icon"><i class="fa-regular fa-clock"></i></div>';
+                html += '<div class="history-avatar ' + warnaAva + '">' + inisial + '</div>';
                 html += '<div class="h-info">';
                 html += '<span class="h-name">' + item.nama + '</span>';
                 html += '<span class="h-detail"><i class="fa-solid fa-globe"></i> ' + item.alamat +
@@ -1699,7 +1784,7 @@
         // ============================================================
         function openCS() {
             var phone = '6289684219904';
-            var msg = 'Halo CS E-Book Resepsi, saya mau tanya/menyampaikan sesuatu.';
+            var msg = 'Halo CS E-Book Resepsi, saya mau tanya sesuatu.';
             window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
         }
 
